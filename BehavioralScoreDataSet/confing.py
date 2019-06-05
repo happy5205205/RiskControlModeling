@@ -11,7 +11,7 @@
 import os
 
 # 指定数据集的路径
-data_path = 'D:\work\BehavioralScoreDataSet\data'
+data_path = '.\data'
 
 
 # 结果保存路径

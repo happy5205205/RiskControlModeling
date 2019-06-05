@@ -51,32 +51,32 @@ import pandas as pd
 
 # print(df.iloc[1][2])
 
-
-# data=pd.DataFrame([[-2.1,-1,4.3],[3,1.1,0.12],[3,1.1,0.12]],index=['one','two','three'],columns=list('abc'))
-# print(data)
-# print('相关系数')
-# #one two three的相关系数
-# # 相关系数
-# print(data.corr())
-# #      a    b    c
-# # a  1.0  1.0 -1.0
-# # b  1.0  1.0 -1.0
-# # c -1.0 -1.0  1.0
-# print('协方差')
-
+import numpy as np
+data=pd.DataFrame([[-2.1,-1,4.3],[3,1.1,0.12],[3,1.1,0.12]],index=['one','two','three'],columns=list('abc'))
+print(data)
+print('相关系数')
+#one two three的相关系数
+# 相关系数
+print(data.corr())
+#      a    b    c
+# a  1.0  1.0 -1.0
+# b  1.0  1.0 -1.0
+# c -1.0 -1.0  1.0
+print('协方差')
+print(np.cov(data))
 # from sklearn import datasets
 #
 # iris = datasets.load_iris()
-# X, y = iris.data[:, 1:3], iris.target
+# X, y = iris.data[:, 1:3], iris.task
 # print(X)
 # print('-----------------------------------------------')
 # print(y)
 
-a = 1
-b = 2
-c = 3
-d = 4
-e = zip([a, b, c, d])
-print(e)
+# a = 1
+# b = 2
+# c = 3
+# d = 4
+# e = zip([a, b, c, d])
+# print(e)
 
 

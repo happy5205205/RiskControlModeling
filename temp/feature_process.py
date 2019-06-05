@@ -83,21 +83,21 @@ df_feature['final_prob'] = df_feature.loc[:,features_prob].sum(axis=1)
 #test_label文件,带target,和标签匹配
 df_target = pd.read_csv(open('scenario_a_score_step3_test2',encoding='utf-8'),header=None,sep='|')
 df_target = df_target.iloc[:,:7]
-df_target.columns = ['id_card_no','card_name','member_id','lend_day','rn','raw_y','target']
-df_target = df_target.loc[:,['id_card_no','card_name','lend_day','target']]
+df_target.columns = ['id_card_no','card_name','member_id','lend_day','rn','raw_y','task']
+df_target = df_target.loc[:,['id_card_no','card_name','lend_day','task']]
 df_target = df_target.drop_duplicates()
 df_target = df_target.merge(df_feature.loc[:,['id_card_no','card_name','lend_day','final_score','final_prob']]\
                             ,left_on=['id_card_no','card_name','lend_day']\
                             ,right_on=['id_card_no','card_name','lend_day'],how='inner')
-df_target['target'] = df_target['target'].apply(lambda x : 0 if x==0 else 1)
+df_target['task'] = df_target['task'].apply(lambda x : 0 if x==0 else 1)
 df_target['pred'] = df_target['final_prob'].apply(lambda x : 1 if x>=0.5 else 0)
 
-print('roc:',roc_auc_score(df_target['target'],df_target['final_prob']))
-print('accuracy:',accuracy_score(df_target['target'],df_target['pred']))
-print('precision:',precision_score(df_target['target'],df_target['pred']))
-print('recall:',recall_score(df_target['target'],df_target['pred']))
-print('f1',f1_score(df_target['target'],df_target['pred']))
-KS_AR(df_target, 'final_score', 'target', asc=True)
+print('roc:',roc_auc_score(df_target['task'],df_target['final_prob']))
+print('accuracy:',accuracy_score(df_target['task'],df_target['pred']))
+print('precision:',precision_score(df_target['task'],df_target['pred']))
+print('recall:',recall_score(df_target['task'],df_target['pred']))
+print('f1',f1_score(df_target['task'],df_target['pred']))
+KS_AR(df_target, 'final_score', 'task', asc=True)
 
 
 
