@@ -9,11 +9,11 @@ import os
 # 数据集存放
 data_path = './data'
 
-# 控制开关on, stacking,
-button = 'on'
+# 模型选择控制开关oneModel, stacking, 默认是oneModel
+model_select_button = 'stacking'
 
 # 是否启用随机森林筛选标签 yes表示启用，no表是不启用, 默认是启用
-start_rf_select_feature = 'no'
+start_rf_select_feature = 'yes'
 
 # 随机森林筛选阈值
 rf_select_feature_max = 0.0005
