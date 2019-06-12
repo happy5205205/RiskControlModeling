@@ -66,6 +66,7 @@ def main():
 
         result_df = pd.DataFrame(columns=['train_ks', 'val_ks'], index=model_name_param_dict.keys())
         # 单个模型训练
+        print('单模型自动调参训练')
         for mode_name, (model, param_range) in model_name_param_dict.items():
             train_y_pred, val_y_pred, train_ks, val_ks = utils_2.train_one_model(
                                                                                     mode_name=mode_name,

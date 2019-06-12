@@ -83,7 +83,6 @@ def clean_data(train_data, test_data):
 
 
 def train_one_model(mode_name, model, param_range, X_train, y_train, X_val, y_val, X_test, y_test):
-    print('单模型自动调参训练')
     print('--' * 30)
     print('开始训练{}模型'.format(mode_name))
 

@@ -81,7 +81,7 @@ def clean_data(train_data):
 
 
 def train_one_model(mode_name, model, param_range, X_train, y_train, X_val, y_val):
-    print('单模型自动调参训练')
+
     print('--' * 30)
     print('开始训练{}模型'.format(mode_name))
 
@@ -108,7 +108,7 @@ def train_one_model(mode_name, model, param_range, X_train, y_train, X_val, y_va
 
     best_params = clf.best_params_
     print('模型{}最好的参数是{}'.format(mode_name, best_params))
-
+    print('--' * 30)
     return train_y_pred, val_y_pred, train_ks, val_ks
 
 
@@ -159,7 +159,7 @@ def trian_stacking_model(X_train, y_train, X_val, y_val):
 
     best_params = grid.best_params_
     print('Stacking模型的最好的参数是{}'.format(best_params))
-
+    print('--' * 30)
     return train_y_pred, val_y_pred,  train_ks, val_ks
 
 
