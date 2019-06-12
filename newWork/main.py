@@ -24,6 +24,8 @@ import seaborn as sns
 
 warnings.filterwarnings('ignore')
 warnings.filterwarnings("ignore", category=DeprecationWarning)
+
+# 防止画图中文乱码
 plt.rcParams['font.sans-serif'] = ['SimHei']  # 指定默认字体
 plt.rcParams['axes.unicode_minus'] = False  # 解决保存图像是负号'-'显示为方块的问题
 
@@ -126,7 +128,7 @@ def train_one_model(mode_name, model, param_range, X_train, y_train, X_val, y_va
     return train_y_pred, val_y_pred, test_y_pred, train_ks, val_ks, test_ks
     # return train_y_pred, val_y_pred, train_ks, val_ks
 
-'''
+
 def trian_stacking_model(X_train, y_train, X_val, y_val, X_test, y_test):
     """
         stacking模型训练
@@ -138,28 +140,60 @@ def trian_stacking_model(X_train, y_train, X_val, y_val, X_test, y_test):
         :param y_test:
         :return:
     """
-
-    clf1 = RandomForestClassifier(n_estimators=3, random_state=1)
+    clf1 = RandomForestClassifier()
     lr = LogisticRegression()
-    sclf = StackingClassifier(classifiers=clf1, use_probas=True, average_probas=False, meta_classifier=lr)
+    sclf = StackingClassifier(classifiers=[clf1], use_probas=True, average_probas=False, meta_classifier=lr)
+    params = {'randomforestclassifier__n_estimators': [10, 100, 1000],
+              'randomforestclassifier__criterion': ['entropy', 'gini'],
+              'randomforestclassifier__max_depth': range(10, 200, 40),
+              'randomforestclassifier__min_samples_split': [2, 5, 10],
+              'randomforestclassifier__min_weight_fraction_leaf': list(np.arange(0, 0.5, 0.1)),
+              'meta_classifier__C': [0.1, 10.0]}
 
-    print('3-fold cross validation:\n')
+    grid = GridSearchCV(estimator=sclf, param_grid=params, cv=5, refit=True, n_jobs=-1)
 
-    for clf, label in zip([clf1, sclf], ['Random Forest', 'StackingClassifier']):
-        scores = model_selection.cross_val_score(clf, X_train, y_train, cv=3, scoring='accuracy')
-        # print("Accuracy: %0.2f (+/- %0.2f) [%s]"
-        #       % (scores.mean(), scores.std(), label))
-        print('--'*30)
-        print('Accuracy:{:.3f},scores:{:.3f},label:{}.'.format(scores.mean(), scores.std(), label))
-'''
+    grid.fit(X_train, y_train)
+
+    train_score = grid.score(X_train, y_train)
+    print('stacking模型的训练集准确率：{:.3f}'.format(train_score))
+    train_y_pred = grid.predict_proba(X_train)[:, 1]
+    FPR, TPR, threshold = roc_curve(y_train, train_y_pred)
+    train_ROC_AUC = auc(FPR, TPR)
+    print('stacking模型的训练集AUC:{:.3f}'.format(train_ROC_AUC))
+    train_ks = max(abs(TPR - FPR))
+    print('stacking模型的训练集KS:{:.3f}'.format(train_ks))
+
+    val_score = grid.score(X_val, y_val)
+    print('stacking模型的验证集准确率：{:.3f}'.format(val_score))
+    val_y_pred = grid.predict_proba(X_val)[:, 1]
+    FPR, TPR, threshold = roc_curve(y_val, val_y_pred)
+    val_ROC_AUC = auc(FPR, TPR)
+    print('stacking模型的验证集AUC:{:.3f}'.format(val_ROC_AUC))
+    val_ks = max(abs(TPR - FPR))
+    print('stacking模型的验证集KS:{:.3f}'.format(val_ks))
+
+    test_score = grid.score(X_test, y_test)
+    print('stacking模型的测试集准确率：{:.3f}'.format(test_score))
+    test_y_pred = grid.predict_proba(X_test)[:, 1]
+    FPR, TPR, threshold = roc_curve(y_test, test_y_pred)
+    test_ROC_AUC = auc(FPR, TPR)
+    print('stacking模型的测试集AUC:{:.3f}'.format(test_ROC_AUC))
+    test_ks = max(abs(TPR - FPR))
+    print('stacking模型的测试集KS:{:.3f}'.format(test_ks))
+
+    best_params = grid.best_params_
+    print('stacking模型的最好的参数是{}'.format(best_params))
+    print('--' * 30)
+    return train_y_pred, val_y_pred, test_y_pred, train_ks, val_ks, test_ks
+
 
 def ks_plot(train_y_pred, y_train, val_y_pred, y_val, test_y_pred, y_test, mode_name='stacking'):
-# def ks_plot(mode_name, train_y_pred, y_train, val_y_pred, y_val):
+    # def ks_plot(mode_name, train_y_pred, y_train, val_y_pred, y_val):
     """
         计算KS图像绘制
         :return:
     """
-#    print('开始绘制{}模型的KS'.format(mode_name))
+    print('开始绘制{}模型的KS'.format(mode_name))
 
     plt.figure(figsize=(12,12))
     plt.subplot(2, 1, 1)
@@ -351,65 +385,17 @@ def main():
         campare_ks(data=data)
 
     elif config.model_select_button == 'stacking':
-        # trian_stacking_model(X_train=X_train, y_train=y_train, X_val=X_val, y_val=y_val, X_test=X_test, y_test=y_test)
-        clf1 = RandomForestClassifier()
-        lr = LogisticRegression()
-        sclf = StackingClassifier(classifiers=[clf1], use_probas=True, average_probas=False, meta_classifier=lr)
-        params = {'randomforestclassifier__n_estimators': [10, 100, 1000],
-                  'randomforestclassifier__criterion': ['entropy', 'gini'],
-                  # 'randomforestclassifier__max_depth': range(10, 200, 40),
-                  # 'randomforestclassifier__min_samples_split': [2, 5, 10],
-                  # 'randomforestclassifier__min_weight_fraction_leaf': list(np.arange(0, 0.5, 0.1)),
-                  'meta_classifier__C': [0.1, 10.0]}
-        
-        grid = GridSearchCV(estimator=sclf, param_grid=params, cv=5, refit=True)
-        
-        grid.fit(X_train, y_train)
+        train_y_pred, val_y_pred, test_y_pred, train_ks, val_ks, test_ks = trian_stacking_model(
+                                                                                                X_train=X_train,
+                                                                                                y_train=y_train,
+                                                                                                X_val=X_val,
+                                                                                                y_val=y_val,
+                                                                                                X_test=X_test,
+                                                                                                y_test=y_test)
 
-        train_score = grid.score(X_train, y_train)
-        print('stacking模型的训练集准确率：{:.3f}'.format(train_score))
-        train_y_pred = grid.predict_proba(X_train)[:, 1]
-        FPR, TPR, threshold = roc_curve(y_train, train_y_pred)
-        train_ROC_AUC = auc(FPR, TPR)
-        print('stacking模型的训练集AUC:{:.3f}'.format(train_ROC_AUC))
-        train_ks = max(abs(TPR - FPR))
-        print('stacking模型的训练集KS:{:.3f}'.format(train_ks))
-
-        val_score = grid.score(X_val, y_val)
-        print('stacking模型的验证集准确率：{:.3f}'.format(val_score))
-        val_y_pred = grid.predict_proba(X_val)[:, 1]
-        FPR, TPR, threshold = roc_curve(y_val, val_y_pred)
-        val_ROC_AUC = auc(FPR, TPR)
-        print('stacking模型的验证集AUC:{:.3f}'.format(val_ROC_AUC))
-        val_ks = max(abs(TPR - FPR))
-        print('stacking模型的验证集KS:{:.3f}'.format(val_ks))
-
-        test_score = grid.score(X_test, y_test)
-        print('stacking模型的测试集准确率：{:.3f}'.format(test_score))
-        test_y_pred = grid.predict_proba(X_test)[:, 1]
-        FPR, TPR, threshold = roc_curve(y_test, test_y_pred)
-        test_ROC_AUC = auc(FPR, TPR)
-        print('stacking模型的测试集AUC:{:.3f}'.format(test_ROC_AUC))
-        test_ks = max(abs(TPR - FPR))
-        print('stacking模型的测试集KS:{:.3f}'.format(test_ks))
-
-        best_params = grid.best_params_
-        print('stacking模型的最好的参数是{}'.format(best_params))
-        print('--' * 30)
-
-    # return train_y_pred, val_y_pred, test_y_pred, train_ks, val_ks, test_ks
-
-        print('Best parameters: %s' % grid.best_params_)
-        print('Accuracy: %.2f' % grid.best_score_)
-        '''
-        print('3-fold cross validation:\n')
-        for clf, label in zip([clf1, sclf], ['Random Forest', 'StackingClassifier']):
-            scores = model_selection.cross_val_score(clf, X_train, y_train, cv=3, scoring='accuracy')
-        # print("Accuracy: %0.2f (+/- %0.2f) [%s]"
-        #       % (scores.mean(), scores.std(), label))
-            print('--'*30)
-            print('Accuracy:{:.3f},scores:{:.3f},label:{}.'.format(scores.mean(), scores.std(), label))
-        '''
+        # 绘制ks曲线图
+        ks_plot(train_y_pred=train_y_pred, y_train=y_train, val_y_pred=val_y_pred, y_val=y_val,
+                test_y_pred=test_y_pred, y_test=y_test)
     else:
         pass
 

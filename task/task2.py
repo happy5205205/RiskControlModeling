@@ -175,10 +175,17 @@ def train_model(data):
     xgb_train_y_pred = xgb_train_y_pred_prob.round()
     xgb_test_y_pred = xgb_test_y_pred_prob.round()
 
-    return train, test, train_y, test_y, xgb_train_y_pred, xgb_test_y_pred, xgb_train_y_pred_prob,xgb_test_y_pred_prob, y
+    return train, test, train_y, test_y, xgb_train_y_pred, xgb_test_y_pred, xgb_train_y_pred_prob,xgb_test_y_pred_prob
 
 
 def model_evaluation(train_y, xgb_train_y_pred_prob, xgb_test_y_pred_prob):
+    """
+        寻找最大的f1 score
+        :param train_y: 真实的y值
+        :param xgb_train_y_pred_prob: 预测的y值
+        :param xgb_test_y_pred_prob: 预测的y值
+        :return: 训练集真实的y值，测试集真实的y
+    """
 
     xgb_threshold, xgb_f1 = find_threshold(0.1, 0.8, 0.02, train_y, xgb_train_y_pred_prob)
 
@@ -190,7 +197,13 @@ def model_evaluation(train_y, xgb_train_y_pred_prob, xgb_test_y_pred_prob):
 
 def main():
     """
-        1. 数据准备
+        研究分数阈值的定义：
+        （一）计算分数从大到小，按照不同通过率，按照不同好坏比，按照批准件中的好客数量，核准件的坏客数量进行分数阈值判定
+        -- 入参：通过率，或好坏比，或批准件中的好客数量，或核准件的坏客数量,
+        -- 出参：满足上述入参条件的分数阈值
+
+        （二）注意按照分数从大到小移动阈值。
+        -- 研究按照不同分数分箱F1 score max对应的分数作为阈值，进行通过率逾期率监测
     """
     # 显示所有列
     pd.set_option('display.max_columns', None)
@@ -220,7 +233,8 @@ def main():
 
 
     # task 2
-    train, test, train_y, test_y, xgb_train_y_pred, xgb_test_y_pred, xgb_train_y_pred_prob, xgb_test_y_pred_prob,y = train_model(data=data_df)
+
+    train, test, train_y, test_y, xgb_train_y_pred, xgb_test_y_pred, xgb_train_y_pred_prob, xgb_test_y_pred_prob= train_model(data=data_df)
     xgb_train_y_pred1, xgb_test_y_pred1 = model_evaluation(train_y, xgb_train_y_pred_prob, xgb_test_y_pred_prob)
     # --------------------------------测试集----------------------------------------
     df_re = test[['行为雷达_贷款行为分', 'target']]
