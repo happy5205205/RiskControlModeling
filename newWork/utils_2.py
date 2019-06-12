@@ -66,7 +66,7 @@ def clean_feature(row_data):
         return new_feature
 
 
-def clean_data(train_data, test_data):
+def clean_data(train_data):
     """
         数据处理
         :param train_data:
@@ -77,12 +77,10 @@ def clean_data(train_data, test_data):
     # 简单归一化处理
     min_max = MinMaxScaler()
     train_data_min_max = min_max.fit_transform(train_data)
-    test_data_min_max = min_max.transform(test_data)
-    return train_data_min_max, test_data_min_max
-    # return train_data_min_max
+    return train_data_min_max
 
 
-def train_one_model(mode_name, model, param_range, X_train, y_train, X_val, y_val, X_test, y_test):
+def train_one_model(mode_name, model, param_range, X_train, y_train, X_val, y_val):
     print('单模型自动调参训练')
     print('--' * 30)
     print('开始训练{}模型'.format(mode_name))
@@ -108,23 +106,13 @@ def train_one_model(mode_name, model, param_range, X_train, y_train, X_val, y_va
     val_ks = max(abs(TPR - FPR))
     print('{}的验证集KS:{:.3f}'.format(mode_name, val_ks))
 
-    test_score = clf.score(X_test, y_test)
-    print('{}的测试集准确率：{:.3f}'.format(mode_name, test_score))
-    test_y_pred = clf.predict_proba(X_test)[:, 1]
-    FPR, TPR, threshold = roc_curve(y_test, test_y_pred)
-    test_ROC_AUC = auc(FPR, TPR)
-    print('{}的测试集AUC:{:.3f}'.format(mode_name, test_ROC_AUC))
-    test_ks = max(abs(TPR - FPR))
-    print('{}的测试集KS:{:.3f}'.format(mode_name, test_ks))
-
     best_params = clf.best_params_
     print('模型{}最好的参数是{}'.format(mode_name, best_params))
-    print('--'*30)
 
-    return train_y_pred, val_y_pred, test_y_pred, train_ks, val_ks, test_ks
+    return train_y_pred, val_y_pred, train_ks, val_ks
 
 
-def trian_stacking_model(X_train, y_train, X_val, y_val, X_test, y_test):
+def trian_stacking_model(X_train, y_train, X_val, y_val):
     """
         stacking模型训练
         :param X_train:
@@ -135,6 +123,8 @@ def trian_stacking_model(X_train, y_train, X_val, y_val, X_test, y_test):
         :param y_test:
         :return:
     """
+    print('Satck自动调参训练')
+    print('--' * 30)
     clf1 = RandomForestClassifier()
     lr = LogisticRegression()
     sclf = StackingClassifier(classifiers=[clf1], use_probas=True, average_probas=False, meta_classifier=lr)
@@ -156,7 +146,7 @@ def trian_stacking_model(X_train, y_train, X_val, y_val, X_test, y_test):
     train_ROC_AUC = auc(FPR, TPR)
     print('Stacking模型的训练集AUC:{:.3f}'.format(train_ROC_AUC))
     train_ks = max(abs(TPR - FPR))
-    print('Stacking模型的训练集KS:{:.3f}'.format(train_ks))
+    print('stacking模型的训练集KS:{:.3f}'.format(train_ks))
 
     val_score = grid.score(X_val, y_val)
     print('Stacking模型的验证集准确率：{:.3f}'.format(val_score))
@@ -167,22 +157,13 @@ def trian_stacking_model(X_train, y_train, X_val, y_val, X_test, y_test):
     val_ks = max(abs(TPR - FPR))
     print('Stacking模型的验证集KS:{:.3f}'.format(val_ks))
 
-    test_score = grid.score(X_test, y_test)
-    print('Stacking模型的测试集准确率：{:.3f}'.format(test_score))
-    test_y_pred = grid.predict_proba(X_test)[:, 1]
-    FPR, TPR, threshold = roc_curve(y_test, test_y_pred)
-    test_ROC_AUC = auc(FPR, TPR)
-    print('Stacking模型的测试集AUC:{:.3f}'.format(test_ROC_AUC))
-    test_ks = max(abs(TPR - FPR))
-    print('Stacking模型的测试集KS:{:.3f}'.format(test_ks))
-
     best_params = grid.best_params_
     print('Stacking模型的最好的参数是{}'.format(best_params))
 
-    return train_y_pred, val_y_pred, test_y_pred, train_ks, val_ks, test_ks
+    return train_y_pred, val_y_pred,  train_ks, val_ks
 
 
-def ks_plot(train_y_pred, y_train, val_y_pred, y_val, test_y_pred, y_test, mode_name='stacking'):
+def ks_plot(train_y_pred, y_train, val_y_pred, y_val, mode_name='stacking'):
     """
         计算KS图像绘制
         :return:
@@ -208,15 +189,6 @@ def ks_plot(train_y_pred, y_train, val_y_pred, y_val, test_y_pred, y_test, mode_
     plt.plot(TPR - FPR, label='KS={:.3f}'.format(ks_value))
     plt.legend()
 
-    plt.subplot(3, 1, 3)
-    FPR, TPR, threshold = roc_curve(y_test, test_y_pred)
-    ks_value = max(abs(TPR - FPR))
-    plt.title(mode_name+'_test_KS')
-    plt.plot(FPR, label='bad')
-    plt.plot(TPR, label='good')
-    plt.plot(TPR - FPR, label='KS={:.3f}'.format(ks_value))
-    plt.legend()
-
     plt.savefig(os.path.join(config.out_path, mode_name+'_KS.png'))
     plt.close()
 
@@ -228,22 +200,18 @@ def campare_ks(data):
     x_label = list(data['model_name'])
     data1 = list(data['train_ks'])
     data2 = list(data['val_ks'])
-    data3 = list(data['test_ks'])
 
     plt.bar(x=range(len(x_label)), height=data1, label='train_ks', alpha=0.8, width=bar_width)
     plt.bar(x=np.arange(len(x_label))+bar_width, height=data2, label='val_ks', alpha=0.8, width=bar_width)
-    plt.bar(x=np.arange(len(x_label))+bar_width*2, height=data3, label='test_ks', alpha=0.8, width=bar_width)
     # 在柱状图上显示具体数值, ha参数控制水平对齐方式, va控制垂直对齐方式
     for x, y in enumerate(data1):
         plt.text(x, y, '%s' % y, ha='center', va='bottom', fontsize=10)
     for x, y in enumerate(data2):
         plt.text(x+bar_width, y, '%s' % y, ha='center', va='top', fontsize=10)
-    for x, y in enumerate(data3):
-        plt.text(x+bar_width*2, y, '%s' % y, ha='center', va='top', fontsize=10)
 
     plt.xticks(np.arange(len(x_label))+bar_width/2, x_label)
     # 设置标题
-    plt.title("train_ks VS val_ks VS test_ks")
+    plt.title("train_ks VS val_ks")
     # 为两条坐标轴设置名称
     plt.xlabel("model_name")
     plt.ylabel("KS")
