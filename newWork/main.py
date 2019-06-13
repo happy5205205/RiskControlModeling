@@ -61,15 +61,22 @@ def main():
     if config.model_select_button == 'oneModel':
         model_name_param_dict = {
             'KNN': (KNeighborsClassifier(), {'n_neighbors': range(3, 10, 2)}),
-            'LR': (LogisticRegression(), {'C': range(1, 10, 1), 'penalty': ['l1', 'l2']}),
+            'LR': (LogisticRegression(), {'C': range(1, 10, 1), 'penalty': ['l1', 'l2'],
+                                          'solver': ['liblinear']}),
             'DT': (DecisionTreeClassifier(), {'max_leaf_nodes': range(2, 4, 1), 'max_depth': range(4, 10, 2)}),
-            'RF': (RandomForestClassifier(), {'n_estimators': [10, 100, 1000],
+            'RF': (RandomForestClassifier(), {'n_estimators': [50, 100, 10],
                                               'criterion': ['entropy', 'gini'],
-                                              'max_depth': range(10, 200, 40),
+                                              'max_depth': range(50, 100, 10),
                                               'min_samples_split': [2, 5, 10],
                                               'min_weight_fraction_leaf': list(np.arange(0, 0.5, 0.1))}),
-            'Adboost': (AdaBoostClassifier(), {'n_estimators': [50, 100, 150, 200]}),
-            'GBDT': (GradientBoostingClassifier(), {'learning_rate': [0.01, 0.1, 1, 10, 100]})
+            'Adboost': (AdaBoostClassifier(), {'n_estimators': range(50, 100, 10),
+                                               'learning_rate': list(np.arange(0.01, 0.1, 0.01))}),
+            'GBDT': (GradientBoostingClassifier(), {'learning_rate': list(np.arange(0.01, 0.1, 0.01)),
+                                                    'subsample': list(np.arange(0.5, 0.8, 0.1)),
+                                                    'loss': ['deviance', 'exponential'],
+                                                    'n_estimators': range(50, 100, 10),
+                                                    'max_leaf_nodes': range(2, 4, 1),
+                                                    'max_depth': range(4, 10, 2)})
         }
 
         result_df = pd.DataFrame(columns=['train_ks', 'val_ks', 'test_ks'], index=model_name_param_dict.keys())

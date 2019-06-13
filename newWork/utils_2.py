@@ -87,6 +87,7 @@ def train_one_model(mode_name, model, param_range, X_train, y_train, X_val, y_va
 
     clf = GridSearchCV(estimator=model, param_grid=param_range, cv=3, scoring='accuracy', refit=True, n_jobs=-1)
     clf.fit(X_train, y_train)
+    print(clf.grid_scores_, clf.best_params_, clf.best_score_)
 
     train_score = clf.score(X_train, y_train)
     print('{}的训练集准确率：{:.3f}'.format(mode_name, train_score))
@@ -109,6 +110,7 @@ def train_one_model(mode_name, model, param_range, X_train, y_train, X_val, y_va
     best_params = clf.best_params_
     print('模型{}最好的参数是{}'.format(mode_name, best_params))
     print('--' * 30)
+
     return train_y_pred, val_y_pred, train_ks, val_ks
 
 
