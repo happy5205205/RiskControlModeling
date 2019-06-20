@@ -36,7 +36,7 @@ def main():
     data_df = data.dropna()
     # data_df = data.sort_values(by='行为雷达_贷款行为分', ascending=False)
     # print(data_df['行为雷达_贷款行为分'])
-   # pass_rate = (data_df['target'] == 0).sum(axis=0) / len(data_df)
+    # pass_rate = (data_df['target'] == 0).sum(axis=0) / len(data_df)
     # print('原始数据的通过率为{:.3f}'.format(pass_rate))
 
     # 调用批准件函数

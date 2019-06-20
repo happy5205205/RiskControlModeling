@@ -37,6 +37,5 @@ def main():
     results_df['feature'].to_csv(os.path.join(data_path_0515, 'result.csv'))
     print('处理完成，结果保存至{}'.format(os.path.abspath('result.csv')))
 
-
 if __name__ == '__main__':
     main()
