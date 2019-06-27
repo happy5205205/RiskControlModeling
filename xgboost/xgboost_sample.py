@@ -12,7 +12,7 @@ from sklearn.metrics import accuracy_score,roc_auc_score,confusion_matrix,precis
 import math
 import time
 import pdb
-# import argparse
+import argparse
 import time
 start_time = time.time()
 plt.switch_backend('agg')
@@ -158,15 +158,15 @@ def gridsearch(xgb_train,xgb_val,y_val,init_params, grid_param = ['max_depth','m
 
 def main():
     
-    # parser = argparse.ArgumentParser()
-    # parser.add_argument('--train_file', default='train_file.csv')
-    # parser.add_argument('--test_file', default='test_file.csv')
-    # parser.add_argument('--path', default= os.getcwd() )
-    # parser.add_argument('--val_size',type=float, default= 0.2, help='the size of validation dataset')
-    # args = parser.parse_args()
-    #
-    # data_path = args.path+'/data'
-    # result_path = args.path+'/result/model'+time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--train_file', default='train_file.csv')
+    parser.add_argument('--test_file', default='test_file.csv')
+    parser.add_argument('--path', default= os.getcwd() )
+    parser.add_argument('--val_size',type=float, default= 0.2, help='the size of validation dataset')
+    args = parser.parse_args()
+
+    data_path = args.path+'/data'
+    result_path = args.path+'/result/model'+time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
     data_path =  './data'
     
     #读入数据
