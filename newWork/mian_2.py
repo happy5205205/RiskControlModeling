@@ -23,7 +23,7 @@ from newWork import utils_2
 def main():
     print('==================加载数据集==================')
     print('正在加载数据集', end=',')
-    train_row_data = pd.read_csv(os.path.join(config.data_path, 'weidai_800_0612_data_sele_57.csv'))
+    train_row_data = pd.read_csv(os.path.join(config.data_path, 'cyj_helloworld_result_pingtai_suning_800_0702.csv'))
 
     train_row_data = train_row_data.drop_duplicates(subset=['id_card_no', 'card_name', 'loan_date', 'target'],
                                                     keep='first')
