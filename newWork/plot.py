@@ -16,22 +16,29 @@ bar_width = 0.3
 x_label = list(data['model_name'])
 data1 = list(data['train_ks'])
 data2 = list(data['val_ks'])
-data3 = list(data['test_ks'])
+# data3 = list(data['train_auc'])
+# data4 = list(data['val_auc'])
+
+# plt.figure(figsize=(10, 10))
 
 plt.bar(x=range(len(x_label)), height=data1, label='train_ks', alpha=0.8, width=bar_width)
 plt.bar(x=np.arange(len(x_label))+bar_width, height=data2, label='val_ks', alpha=0.8, width=bar_width)
-plt.bar(x=np.arange(len(x_label))+bar_width*2, height=data3, label='test_ks', alpha=0.8, width=bar_width)
+# plt.bar(x=np.arange(len(x_label))+bar_width*2, height=data3, label='train_auc', alpha=0.8, width=bar_width)
+# plt.bar(x=np.arange(len(x_label))+bar_width*3, height=data4, label='val_auc', alpha=0.8, width=bar_width)
+
 # 在柱状图上显示具体数值, ha参数控制水平对齐方式, va控制垂直对齐方式
 for x, y in enumerate(data1):
-    plt.text(x, y, '%s' % y, ha='center', va='bottom', fontsize=8)
+    plt.text(x, y, '%.2f' % y, ha='center', va='bottom', fontsize=9)
 for x, y in enumerate(data2):
-    plt.text(x+bar_width, y, '%s' % y, ha='center', va='top', fontsize=8)
-for x, y in enumerate(data3):
-    plt.text(x+bar_width*2, y, '%s' % y, ha='center', va='top', fontsize=8)
+    plt.text(x+bar_width, y, '%.2f' % y, ha='center', va='top', fontsize=9)
+# for x, y in enumerate(data3):
+#     plt.text(x+bar_width*2, y, '%.2f' % y, ha='center', va='top', fontsize=8)
+# for x, y in enumerate(data4):
+#     plt.text(x+bar_width*3, y, '%.2f' % y, ha='center', va='top', fontsize=8)
 
 plt.xticks(np.arange(len(x_label))+bar_width/2, x_label)
 # 设置标题
-plt.title("train_ks VS val_ks VS test_ks")
+plt.title("train_ks vs val_ks")
 # 为两条坐标轴设置名称
 plt.xlabel("model_name")
 plt.ylabel("KS")

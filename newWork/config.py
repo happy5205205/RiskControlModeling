@@ -10,7 +10,7 @@ import os
 data_path = './data'
 
 # 模型选择控制开关oneModel, stacking, 默认是oneModel
-model_select_button = 'oneModel'
+model_select_button = 'stacking'
 
 # 是否启用随机森林筛选标签 yes表示启用，no表是不启用, 默认是启用
 start_rf_select_feature = 'no'
