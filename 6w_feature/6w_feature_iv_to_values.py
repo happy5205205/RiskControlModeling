@@ -18,7 +18,7 @@ def main():
 
     data_path_0509 = './data0509'
     data_path_0515 = './data0515'
-    tailing_data = './tailing'
+    tailing_data = './sample_zaoyi_6w_0704'
 
     # data1 = pickle.load(open(os.path.join(data_path_0509, 'keepFeaturesFinal1.pkl'), 'rb'), encoding='utf-8')
     # data2 = pickle.load(open(os.path.join(data_path_0509, 'keepFeaturesFinal2.pkl'), 'rb'), encoding='utf-8')
@@ -45,8 +45,8 @@ def main():
         f.close()
 
     new_data = pd.read_csv('my_file.csv')
-    feature_date = pd.read_excel('借贷还贷标签名V2.0标签字典.xlsx', sheet_name='new_merge', index_col=0, usecols=[0, 1], header=None)
-    iv_data = pd.merge(new_data, feature_date, how='left', left_on='feature', right_on=0).loc[:, ['iv', 1]]
+    feature_date = pd.read_excel('借贷还贷标签名V2.0标签字典.xlsx', sheet_name='new_merge', index_col=None, usecols=[0, 1], header=None)
+    iv_data = pd.merge(new_data, feature_date, how='left', left_on='feature', right_on=0).loc[:, [1, 'iv']]
 
     iv_data.to_csv('select_iv.csv', index=False)
 
