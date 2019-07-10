@@ -15,6 +15,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import AdaBoostClassifier
+from lightgbm.sklearn import LGBMClassifier
 import matplotlib.pyplot as plt
 import seaborn as sns
 from newWork import utils_2
@@ -52,23 +53,29 @@ def main():
     print('==================开始数据建模==================')
     if config.model_select_button == 'oneModel':
         model_name_param_dict = {
-            'KNN': (KNeighborsClassifier(), {'n_neighbors': range(3, 10, 2)}),
-            'LR': (LogisticRegression(), {'C': range(1, 10, 1), 'penalty': ['l1', 'l2'],
-                                          'solver': ['liblinear']}),
-            'DT': (DecisionTreeClassifier(), {'max_leaf_nodes': range(2, 4, 1), 'max_depth': range(4, 10, 2)}),
-            'RF': (RandomForestClassifier(), {'n_estimators': range(50, 150, 10),
-                                              'criterion': ['entropy', 'gini'],
-                                              'max_depth': range(50, 200, 10),
-                                              'min_samples_split': range(2, 5, 1),
-                                              'min_weight_fraction_leaf': list(np.arange(0, 0.5, 0.1))}),
-            'Adboost': (AdaBoostClassifier(), {'n_estimators': range(50, 100, 10),
-                                               'learning_rate': list(np.arange(0.01, 0.1, 0.01))}),
-            'GBDT': (GradientBoostingClassifier(), {'learning_rate': list(np.arange(0.01, 0.1, 0.01)),
-                                                    'subsample': list(np.arange(0.5, 0.8, 0.1)),
-                                                    'loss': ['deviance', 'exponential'],
-                                                    'n_estimators': range(50, 100, 10),
-                                                    'max_leaf_nodes': range(2, 4, 1),
-                                                    'max_depth': range(4, 10, 2)})
+            # 'KNN': (KNeighborsClassifier(), {'n_neighbors': range(3, 10, 2)}),
+            # 'LR': (LogisticRegression(), {'C': range(1, 10, 1), 'penalty': ['l1', 'l2'],
+            #                               'solver': ['liblinear']}),
+            # 'DT': (DecisionTreeClassifier(), {'max_leaf_nodes': range(2, 4, 1), 'max_depth': range(4, 10, 2)}),
+            # 'RF': (RandomForestClassifier(), {'n_estimators': range(50, 150, 10),
+            #                                   'criterion': ['entropy', 'gini'],
+            #                                   'max_depth': range(50, 200, 10),
+            #                                   'min_samples_split': range(2, 5, 1),
+            #                                   'min_weight_fraction_leaf': list(np.arange(0, 0.5, 0.1))}),
+            # 'Adboost': (AdaBoostClassifier(), {'n_estimators': range(50, 100, 10),
+            #                                    'learning_rate': list(np.arange(0.01, 0.1, 0.01))}),
+            # 'GBDT': (GradientBoostingClassifier(), {'learning_rate': list(np.arange(0.01, 0.1, 0.01)),
+            #                                         'subsample': list(np.arange(0.5, 0.8, 0.1)),
+            #                                         'loss': ['deviance', 'exponential'],
+            #                                         'n_estimators': range(50, 100, 10),
+            #                                         'max_leaf_nodes': range(2, 4, 1),
+            #                                         'max_depth': range(4, 10, 2)}),
+            'LGBM': (LGBMClassifier(), {'objective': ['binary'], 'boosting_type': ['gbdt', 'rf'],
+                                        'num_leaves': range(11, 51, 2), 'max_depth': range(-1, 10, 1),
+                                        'learning_rate': list(np.arange(0.01, 0.1, 0.01)),
+                                        'n_estimators': range(50, 100, 10), 'silent': [False],
+                                        'lambda_l1': [0, 0.1, 0.4, 0.5, 0.6], 'lambda_l2': [0, 10, 15, 35, 40],
+                                        'cat_smooth': [1, 10, 15, 20, 35], 'min_split_gain': range(-1, 10, 1)})
                                 }
 
         result_df = pd.DataFrame(columns=['train_ks', 'val_ks'], index=model_name_param_dict.keys())
